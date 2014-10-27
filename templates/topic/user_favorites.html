@@ -1,0 +1,143 @@
+{% extends 'snippet/layout.html' %}
+
+{% block main %}
+<div class="topics container-box user-topics">
+    <div class="ui-header">
+        <span class="bread-nav"><a href="/">叁年壹班</a> › {{ user_info.username }} › 收藏的话题列表</span>
+    </div>
+
+    <div class="ui-content">
+        {% for favorite in favorites.list %}
+        <div class="topic-item">
+            <a href="/u/{{ favorite.author_username }}">
+                <img src="/static/avatar/m_{{ favorite.author_avatar or 'default.png' }}" alt="" class="avatar" />
+            </a>
+            <div class="main">
+                <h3 class="title">
+                    <a href="/t/{{ favorite.id }}">{{ favorite.title }}</a>
+                </h3>
+                <div class="meta">
+                    <span class="node">
+                        <a href="/node/{{ favorite.node_slug }}">{{ favorite.node_name }}</a>
+                    </span>
+                    •
+                    <span class="username">
+                        <a href="/u/{{ favorite.author_username or favorite.author_uid }}">{{ favorite.author_username }}</a>
+                    </span>
+                    • 
+                            {% if favorite.last_replied_time %}
+                    <span class="last-touched">{{ favorite.last_touched|pretty_date }}</span>
+                    •
+                    <span class="last-reply-username">
+                        最后回复来自
+                        <a href="/u/{{ favorite.last_replied_username or favorite.last_replied_uid }}"> <strong>{{ favorite.last_replied_username }}</strong>
+                        </a>
+                    </span>
+                    {% else %}
+                    <span class="last-touched">{{ favorite.last_touched|pretty_date }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if favorite.reply_count %}
+            <div class="count">
+                <a href="/t/{{ favorite.id }}">{{ favorite.reply_count or 0 }}</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+            {% if favorites.page.total == 0 %}
+        <div class="pl10 pr10">
+            <div class="alert mt20">该用户暂时还没有收藏过话题。</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="ui-footer">
+        <div class="pagination">{{ favorites.page|pagination(request.uri) }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="usercard container-box">
+    <div class="ui-header">
+        <a href="/u/{{ user_info.username }}">
+            <img src="/static/avatar/m_{{ user_info.avatar or 'default.png' }}?t={{ gen_random() }}" alt="" class="avatar" />
+        </a>
+        <div class="username">{{ user_info.username }}</div>
+        <div class="collegename">{{ user_info.collegename }}</div>
+        <div class="website">{{ user_info.website or '' }}</div>
+    </div>
+    <div class="ui-content">
+        <div class="status status-topic"> <strong><a href="/u/{{ user_info.username }}/topics">{{ user_info.counter.topics }}</a></strong> 
+            话题
+        </div>
+        <div class="status status-reply">
+            <strong><a href="/u/{{ user_info.username }}/replies">{{ user_info.counter.replies }}</a></strong> 
+            回复
+        </div>
+        <div class="status status-favorite">
+            <strong>
+                <a href="/u/{{ user_info.username }}/favorites">{{ user_info.counter.favorites }}</a>
+            </strong>
+            收藏
+        </div>
+        <div class="status status-reputation">
+            <strong>{{ user_info.reputation or 0 }}</strong>
+            声望
+        </div>
+    </div>
+</div>
+{% if user_info.counter.notifications %}
+<div class="alert mt10 mb10">
+    <span>
+        <a href="/notifications">
+            {{ user_info.nickname or user_info.username }}，同学，您有{{ user_info.counter.notifications }}条未读提醒，去看看吧
+        </a>
+    </span>
+</div>
+{% endif %}
+{% if user_info.counter.messages %}
+<div class="alert alert-success mt10 mb10">
+    <span>
+        <a href="/messages" style="color: #468847;">
+            {{ user_info.nickname or user_info.username }}，同学，您有{{ user_info.counter.messages }}条私信提醒，去看看吧
+        </a>
+    </span>
+</div>
+{% endif %}
+<div class="sidebox container-box mt10 ">
+    <div class="ui-header">
+        <span class="title" style="color: #009a61">这是哪里？<div class="fr"><a href="http://www.vvovo.com/t/1">了解更多</a></div></span>
+    </div>
+    <div class="ui-content">
+        径成校区是一个全国性的综合校园，你原来的学校浓缩为这个校区的一部分，在这里，你将跨出地理隔阂，认识来自全国各地的同学，可以学习交流，可以河边谈人生，也可以发表文章亦或意见......总之，这里会有一片属于你自己的天空。
+        <p class="hor-tabs" style="margin-bottom: 0px">
+            <a href="/register" style="color: #009a61">立即注册</a>
+            <i></i>
+            <a href="http://www.vvovo.com/t/2" style="color: #009a61">如何发帖</a>
+        </p>
+    </div>
+</div>
+<div class="sidebox container-box mt10 ">
+    <div class="ui-header">
+        <span class="title">最热小组<div class="fr"><a href="/nodes">all</a></div></span>
+    </div>
+    <div class="ui-content hot-nodes">
+        {% for node in hot_nodes %}
+        <a href="/node/{{ node.slug }}">{{ node.name }}</a>
+        {% endfor %}
+    </div>
+</div>
+<div class="sidebox container-box mt10 ">
+    <div class="ui-header">
+        <span class="title">热门学校<div class="fr"><a href="/colleges">all</a></div></span>
+    </div>
+    <div class="ui-content hot-nodes">
+        {% for college in hot_colleges %}
+        <a href="/college/{{ college.id }}">{{ college.name }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
